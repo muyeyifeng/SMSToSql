@@ -126,6 +126,8 @@ namespace esp8266_smsResponse
             switch (CODE_TYPE)
             {
                 case "00":  //7bit编码
+                    data_Length /= 2;
+                    data_Length = (data_Length % 8 + data_Length / 8 * 7) * 2;
                     data = Bit_7ToString(raw.Substring(index, data_Length));
                     break;
                 case "04":  //8bit编码
@@ -141,6 +143,7 @@ namespace esp8266_smsResponse
             keyValuePairs.Add("date", date_format.ToString());
             keyValuePairs.Add("data", data);
             keyValuePairs.Add("hash", SHA1_Encrypt(SMSC + date_format.ToString() + data));
+            keyValuePairs.Add("raw", raw);
             return keyValuePairs;
         }
         /// <summary>
@@ -175,7 +178,8 @@ namespace esp8266_smsResponse
                 bitString.Append(HexToBit(tmpH));
                 bitString.Append(HexToBit(tmpL));
             }
-            bitString.Remove(0, bit.Length / 2);
+            // bitString.Remove(0, bit.Length / 2);
+            bitString.Remove(0, bit.Length / 2 % 8);
 
             StringBuilder decodeucd = new StringBuilder();
             string bitstring = bitString.ToString();

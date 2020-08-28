@@ -2,9 +2,11 @@ import uhashlib
 import ubinascii
 import urequests
 import os
+import machine
 #更新文件
 #url
 hashs=urequests.get(url+'esp8266/hash')
+isupdate=False
 if hashs.status_code == 200 :
     hashs=hashs.content.decode().split('\n')
     hashs=hashs[0:-1]
@@ -21,11 +23,17 @@ if hashs.status_code == 200 :
                         'filename':tmp[1]}
                 os.remove(tmp[1])
                 exec(open('./download.py').read(),locals)
+                isupdate=True
                 
         except:
             print('file {} not exist'.format(tmp[1]))
             locals={'url':url+'esp8266/'+tmp[1],
-                        'filename':tmp[1]}
+                    'filename':tmp[1]
+                    }
             exec(open('./download.py').read(),locals)
+            isupdate=True
 else:
     print(hashs.status_code)
+
+if isupdate:
+    machine.reset()
